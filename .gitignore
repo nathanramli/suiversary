@@ -1,1 +1,3 @@
 suiversary/build
+node_modules
+.env
