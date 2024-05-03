@@ -17,6 +17,9 @@ dependencies:
   '@scallop-io/sui-package-kit':
     specifier: ^0.38.1
     version: 0.38.2(@mysten/sui.js@0.37.1)
+  colorts:
+    specifier: ^0.1.63
+    version: 0.1.63
   fs:
     specifier: 0.0.1-security
     version: 0.0.1-security
