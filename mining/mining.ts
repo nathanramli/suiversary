@@ -49,13 +49,48 @@ const submitProof = async (coin: Coin, gas: Coin) => {
 
 const splitObjects = async () => {
     try {
-        const txb = new SuiTxBlock();
-        const array = new Array(500);
-        array.fill(1);
-        const arr = txb.splitCoins(txb.gas, array);
-        txb.transferObjects(arr, suiKit.currentAddress());
-        const resp = await suiKit.signAndSendTxn(txb);
-        console.log("Objects splitted: ", resp.digest)
+        do {
+            const txb = new SuiTxBlock();
+            const array = new Array(500);
+            array.fill(1);
+            let arr = txb.splitCoins(txb.gas, array);
+            txb.transferObjects(arr, suiKit.currentAddress());
+            arr = txb.splitCoins(txb.gas, array);
+            txb.transferObjects(arr, suiKit.currentAddress());
+            txb.setSender(suiKit.currentAddress());
+
+            const txBytes = await txb.build({
+                provider: suiKit.provider(),
+            })
+
+            const resp = await suiKit.provider().dryRunTransactionBlock({
+                transactionBlock: txBytes
+            })
+         
+            let ok = false;
+            for (const changes of resp.objectChanges) {
+                if (changes.type === 'created') {
+                    if (changes.objectId.startsWith("0x0000")) {
+                        console.log(`Hash Found: ${changes.objectId}`.bgGreen)
+                        ok = true;
+                    } else if (changes.objectId.startsWith("0x00")) {
+                        console.log(`Almost rare: ${changes.objectId}`.gray)
+                    }
+                }
+            }
+
+            if (ok) {
+                const resp = await suiKit.signAndSendTxn(txBytes);
+                console.log(`Creating hash: ${resp.digest}`.blue)
+                break;
+            } else {
+                console.log("No rare hash found.".yellow)
+
+                const txb = new SuiTxBlock();
+                const resp = await suiKit.signAndSendTxn(txb);
+                console.log(`Updating version: ${resp.digest}`.blue)
+            }
+        } while (true);
     } catch (e) {
         console.error("Error when splitting objects: ", e);
         process.exit(0);
@@ -71,10 +106,17 @@ const mergeObjects = async (coins: Array<Coin>, gas: Coin) => {
             const subarr = coins.splice(1, 500)
             const objectIds = subarr.map(coin => txb.object(coin.objectId))
             txb.mergeCoins(txb.gas, objectIds)
+
+            if (coins.length > 2) {
+                const subarr = coins.splice(1, 500)
+                const objectIds = subarr.map(coin => txb.object(coin.objectId))
+                txb.mergeCoins(txb.gas, objectIds)
+            }
+
             const resp = await suiKit.signAndSendTxn(txb);
 
             gas = await refetchGas(gas)
-            console.log("Objects merged: ", resp.digest)
+            console.log(`Objects merged: ${resp.digest}`.blue)
         }
     } catch (e) {
         console.error("Error when merging objects: ", e);
