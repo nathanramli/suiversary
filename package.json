@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
-    "@mysten/sui.js": "^0.37.1",
-    "@scallop-io/sui-kit": "^0.37.1",
+    "@mysten/sui.js": "^0.52.0",
+    "@scallop-io/sui-kit": "^0.45.0",
     "@scallop-io/sui-package-kit": "^0.38.1",
     "colorts": "^0.1.63",
     "fs": "0.0.1-security",
