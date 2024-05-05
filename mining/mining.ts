@@ -76,9 +76,9 @@ const splitObjects = async () => {
             console.log(`Hash Found: ${changes.objectId}`.bgGreen);
             ok = true;
           }
-          //  else if (changes.objectId.startsWith("0x00")) {
-          //   console.log(`Almost rare: ${changes.objectId}`.gray);
-          // }
+           else if (changes.objectId.startsWith("0x00")) {
+            console.log(`Almost rare: ${changes.objectId}`.gray);
+          }
         }
       }
 
