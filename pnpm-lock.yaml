@@ -17,6 +17,9 @@ dependencies:
   '@scallop-io/sui-package-kit':
     specifier: ^0.38.1
     version: 0.38.2(@mysten/sui.js@0.52.0)
+  bignumber.js:
+    specifier: ^9.1.2
+    version: 9.1.2
   colorts:
     specifier: ^0.1.63
     version: 0.1.63
@@ -698,6 +701,10 @@ packages:
 
   /bech32@2.0.0:
     resolution: {integrity: sha512-LcknSilhIGatDAsY1ak2I8VtGaHNhgMSYVxFrGLXv+xLHytaKZKcaUJJUE7qmBr7h33o5YQwP55pMI0xmkpJwg==}
+    dev: false
+
+  /bignumber.js@9.1.2:
+    resolution: {integrity: sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug==}
     dev: false
 
   /brace-expansion@1.1.11:

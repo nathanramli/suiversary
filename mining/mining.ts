@@ -3,6 +3,7 @@ import { SUI_TYPE_ARG, SuiTxBlock } from "@scallop-io/sui-kit";
 import { suiKit } from "./util";
 import { ProtocolConfig, SuiObjectRef } from "@mysten/sui.js/src/client";
 import { SuiversaryTxBuilder } from "./txBuilder";
+import BigNumber from "bignumber.js";
 
 type Coin = {
   balance: string;
@@ -120,10 +121,25 @@ const mergeObjects = async (coins: Array<Coin>, gas: Coin) => {
   }
 };
 
-const observeObjects = async () => {
+const splitGasObject = async (amount: string) => {
+  try {
+    const txb = new SuiTxBlock();
+    txb.setSender(suiKit.currentAddress());
+
+    const [newCoin] = txb.splitCoins(txb.gas, [amount]);
+    txb.transferObjects([newCoin], suiKit.currentAddress());
+
+    const resp = await suiKit.signAndSendTxn(txb);
+    console.log(`Gas object split: ${resp.digest}`.blue);
+  } catch (e) {
+    console.error("Error when splitting gas object: ", e);
+    process.exit(0);
+  }
+}
+
+const observeObjects = async (): Promise<void> => {
   try {
     const coins = new Array<Coin>();
-
     let cursor = null;
     do {
       const resp = await suiKit.client().getCoins({
@@ -144,6 +160,21 @@ const observeObjects = async () => {
     } while (cursor !== null);
 
     let gasIndex = coins.findIndex((coin) => !coin.objectId.startsWith("0x0000"));
+    // if gas coin is the rare one, split it
+    if (gasIndex === -1) {
+      console.log(`Gas coin is the rare one! Trying to split current gas coin...`.yellow)
+      // calculate the exact amount of split
+      const MIN_GAS_BALANCE = 1e6; // minimum 0.001 for new gas coin
+      const REQUIRED_RARE_COIN_BALANCE = 1e9
+      const gasBalanceToSplit = BigNumber(coins[0].balance).minus(REQUIRED_RARE_COIN_BALANCE);
+      if(gasBalanceToSplit.isLessThan(MIN_GAS_BALANCE)) {
+        throw new Error("New gas coin balance is too low to split");
+      }
+      await splitGasObject(gasBalanceToSplit.toString());
+
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // give some delay
+      return observeObjects();
+    }
     let gas = coins.splice(gasIndex, 1)[0];
     for (let i = 0; i < coins.length; i++) {
       if (parseInt(coins[i].balance) > parseInt(gas.balance) && !coins[i].objectId.startsWith("0x0000")) {
@@ -178,6 +209,7 @@ const observeObjects = async () => {
     console.error("Error when observing objects: ", e);
     process.exit(0);
   }
+  return;
 };
 
 const main = async () => {
