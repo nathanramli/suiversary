@@ -114,25 +114,6 @@ const mergeObjects = async (coins: Array<Coin>, gas: Coin) => {
 
     gas = await refetchGas(gas);
     console.log(`Objects merged: ${resp.digest}`.blue);
-    // while (coins.length > 1) {
-    //   const txb = new SuiTxBlock();
-    //   txb.setGasPayment([gas]);
-
-    //   const subarr = coins.splice(1, 500);
-    //   // const objectIds = subarr.map((coin) => txb.object(coin.objectId));
-    //   txb.mergeCoins(txb.gas, subarr);
-
-    //   if (coins.length > 2) {
-    //     const subarr = coins.splice(1, 500);
-    //     // const objectIds = subarr.map((coin) => txb.object(coin.objectId));
-    //     txb.mergeCoins(txb.gas, subarr);
-    //   }
-
-    //   const resp = await suiKit.signAndSendTxn(txb);
-
-    //   gas = await refetchGas(gas);
-    //   console.log(`Objects merged: ${resp.digest}`.blue);
-    // }
   } catch (e) {
     console.error("Error when merging objects: ", e);
     process.exit(0);
