@@ -2,7 +2,7 @@
 name = "Suiversary"
 version = "0.0.1"
 edition = "2024.beta"
-published-at = "0xdb9f34b220e76e333553dc4c4bc6f3110d5c103b60316562eeab34b1fa902349"
+published-at = "0xcd2969eebde55421f4a18d20d93a9447fb82ca8d135a7d7f24f1c2e691903cf9"
 
 [dependencies.Sui]
 git = "https://github.com/MystenLabs/sui.git"

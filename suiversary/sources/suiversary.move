@@ -107,6 +107,7 @@ module suiversary::suiversary {
         transfer::transfer(suiversary, ctx.sender())
     }
 
+    #[allow(lint(self_transfer))]
     public fun burn(suiversary: Suiversary, ctx: &mut TxContext) {
         let Suiversary { id, coin, number, minted_timestamp: _ } = suiversary;
         sui::event::emit(SuiversaryBurnedEvent {
