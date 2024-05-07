@@ -26,6 +26,11 @@ module suiversary::suiversary {
         timestamp: u64,
     }
 
+    public struct SuiversaryBurnedEvent has copy, drop {
+        number: u8,
+        sender: address,
+    }
+
     const MAX_SUPPLY: u8 = 10;
     const MAX_POW_SUPPLY: u8 = 100;
 
@@ -100,6 +105,16 @@ module suiversary::suiversary {
         });
         
         transfer::transfer(suiversary, ctx.sender())
+    }
+
+    public fun burn(suiversary: Suiversary, ctx: &mut TxContext) {
+        let Suiversary { id, coin, number, minted_timestamp: _ } = suiversary;
+        sui::event::emit(SuiversaryBurnedEvent {
+            number,
+            sender: ctx.sender(),
+        });
+        object::delete(id);
+        transfer::public_transfer(coin, ctx.sender());
     }
 
     fun proof(id: &ID) {
